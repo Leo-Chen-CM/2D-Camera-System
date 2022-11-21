@@ -6,7 +6,7 @@ It is currently aimed at 2D side scrollers.
 ## Setup Component
 You need to add the component to your project using the Package Manager. Open the Package Manager (Windows > Package Manager), click on the + icon and select "Add package from git URL..." and enter:
 
-https://github.com/Leo-Chen-CM/2D-Camera-System.git?path=/2D%20Camera%20Project/Packages/2d.camera.system#v0.2.0
+https://github.com/Leo-Chen-CM/2D-Camera-System.git?path=/2D%20Camera%20Project/Packages/2d.camera.system#v0.2.1
 
 Note that the URL specifies the complete path to the package and a git tag. The package should now be visible in your project.
 
