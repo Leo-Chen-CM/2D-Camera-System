@@ -1,5 +1,5 @@
 {
-    "name": "Tests",
+    "name": "2DCamerSystemTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
