@@ -23,6 +23,7 @@ public class CameraSystem2D : MonoBehaviour
     //Toggles
     public bool m_toggleSpeedZoomOut;
     public bool m_toggleFadeOut;
+    public bool m_toggleCameraFollowPlayer;
 
 
     private bool m_fadeToBlack;
@@ -48,7 +49,7 @@ public class CameraSystem2D : MonoBehaviour
         m_blackOutImage.AddComponent<Image>();
         m_blackOutImage.name = "FadeOutScreen";
         m_blackOutImage.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0f, 0f);
-        m_blackOutImage.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(1200, 600);
+        m_blackOutImage.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
         m_blackOutImage.GetComponent<Image>().color = new Color(0,0,0,0);
 
         m_mainPlayer = GameObject.FindGameObjectWithTag("Player");
@@ -59,33 +60,36 @@ public class CameraSystem2D : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_mainPlayer == null)
+
+        if (m_toggleCameraFollowPlayer)
         {
-            Debug.LogError("Main player can not be found");
-        }
-        else
-        {
-            transform.position = new Vector3( m_mainPlayer.transform.position.x , m_mainPlayer.transform.position.y, -10);
-            if (m_toggleSpeedZoomOut)
+            if (m_mainPlayer == null)
             {
-                SpeedZoom();
+                Debug.LogError("Main player can not be found");
             }
-
-            if (m_toggleFadeOut)
+            else
             {
-                if (Input.GetKeyUp(KeyCode.E))
+                transform.position = new Vector3( m_mainPlayer.transform.position.x , m_mainPlayer.transform.position.y, -10);
+                if (m_toggleSpeedZoomOut)
                 {
-                    if (true)
-                    {
-                        StopAllCoroutines();
-                        m_fadeToBlack = !m_fadeToBlack;
-                        StartCoroutine(FadeToBlack(m_fadeToBlack,m_fadeoutSpeed));
-                    }
+                    SpeedZoom();
+                }
 
+                if (m_toggleFadeOut)
+                {
+                    if (Input.GetKeyUp(KeyCode.E))
+                    {
+                        if (true)
+                        {
+                            StopAllCoroutines();
+                            m_fadeToBlack = !m_fadeToBlack;
+                            StartCoroutine(FadeToBlack(m_fadeToBlack,m_fadeoutSpeed));
+                        }
+
+                    }
                 }
             }
         }
-
     }
 
     void SpeedZoom()
