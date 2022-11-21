@@ -75,19 +75,21 @@ public class CameraSystem2D : MonoBehaviour
                     SpeedZoom();
                 }
 
-                if (m_toggleFadeOut)
-                {
-                    if (Input.GetKeyUp(KeyCode.E))
-                    {
-                        if (true)
-                        {
-                            StopAllCoroutines();
-                            m_fadeToBlack = !m_fadeToBlack;
-                            StartCoroutine(FadeToBlack(m_fadeToBlack,m_fadeoutSpeed));
-                        }
+               
+            }
+        }
 
-                    }
+        if (m_toggleFadeOut)
+        {
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                if (true)
+                {
+                    StopAllCoroutines();
+                    m_fadeToBlack = !m_fadeToBlack;
+                    StartCoroutine(FadeToBlack(m_fadeToBlack, m_fadeoutSpeed));
                 }
+
             }
         }
     }
