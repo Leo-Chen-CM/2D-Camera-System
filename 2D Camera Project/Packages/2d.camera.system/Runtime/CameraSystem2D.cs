@@ -25,7 +25,6 @@ public class CameraSystem2D : MonoBehaviour
     public bool m_toggleFadeOut;
     public bool m_toggleCameraFollowPlayer;
 
-
     private bool m_fadeToBlack;
     // Start is called before the first frame update
     void Start()
@@ -57,6 +56,11 @@ public class CameraSystem2D : MonoBehaviour
         m_originalCameraSize = Camera.main.orthographicSize;
     }
 
+    public GameObject ReturnBlackOutImage()
+    {
+        return m_blackOutImage;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -65,7 +69,7 @@ public class CameraSystem2D : MonoBehaviour
         {
             if (m_mainPlayer == null)
             {
-                Debug.LogError("Main player can not be found");
+                Debug.LogError("Main player can not be found, add the Player tag to the main player.");
             }
             else
             {
@@ -73,9 +77,7 @@ public class CameraSystem2D : MonoBehaviour
                 if (m_toggleSpeedZoomOut)
                 {
                     SpeedZoom();
-                }
-
-               
+                }              
             }
         }
 
@@ -83,39 +85,44 @@ public class CameraSystem2D : MonoBehaviour
         {
             if (Input.GetKeyUp(KeyCode.E))
             {
-                if (true)
-                {
-                    StopAllCoroutines();
-                    m_fadeToBlack = !m_fadeToBlack;
-                    StartCoroutine(FadeToBlack(m_fadeToBlack, m_fadeoutSpeed));
-                }
-
+                FadeInOut();
             }
         }
     }
 
-    void SpeedZoom()
+    private void SpeedZoom()
     {
-        Vector2 vel = m_mainPlayer.GetComponent<Rigidbody2D>().velocity;
+        Vector2 vel = new Vector2( m_mainPlayer.GetComponent<Rigidbody2D>().velocity.x, 0.0f);
         m_currentSpeed = vel.magnitude;
-        if (m_currentSpeed > 0 && Camera.main.orthographicSize < m_maxSize)
+        if (m_currentSpeed > 0.5f && Camera.main.orthographicSize < m_maxSize)
         {
-            Camera.main.orthographicSize += m_originalCameraSize * (m_currentSpeed/2);
-            //Camera.main.orthographicSize +=  0.01f;
+            //Camera.main.orthographicSize += m_originalCameraSize * (m_currentSpeed/2);
+            Camera.main.orthographicSize +=  0.01f * (m_currentSpeed / 2);
         }
-        //else if (Camera.main.orthographicSize > m_maxSize)
-        //{
-        //    Camera.main.orthographicSize = m_maxSize;
-        //}
+        else if (Camera.main.orthographicSize > m_maxSize)
+        {
+            Camera.main.orthographicSize = m_maxSize;
+        }
         else
         {
             if (Camera.main.orthographicSize > m_originalCameraSize)
             {
-                Camera.main.orthographicSize -= 0.01f;
+                Camera.main.orthographicSize -= 0.02f;
+            }
+
+            if (Camera.main.orthographicSize < m_originalCameraSize)
+            {
+                Camera.main.orthographicSize = m_originalCameraSize;
             }
         }
     }
 
+    public void FadeInOut()
+    {
+        StopAllCoroutines();
+        m_fadeToBlack = !m_fadeToBlack;
+        StartCoroutine(FadeToBlack(m_fadeToBlack, m_fadeoutSpeed));
+    }
 
     IEnumerator FadeToBlack(bool t_fadeToBlack = true, int t_fadeSpeed = 5)
     {

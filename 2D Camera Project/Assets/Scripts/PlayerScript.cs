@@ -6,7 +6,7 @@ public class PlayerScript : MonoBehaviour
 {
     //Movement
     private float speed = 10;
-    private float jumpHeight = 5.0f;
+    private float jumpHeight = 2.0f;
     private Vector2 playerVelocity;
     float horizontalMove = 0f;
     private Rigidbody2D rig;

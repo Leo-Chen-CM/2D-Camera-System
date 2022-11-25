@@ -1,6 +1,6 @@
 {
   "name": "2d.genericgames.expanded.camera.effects",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "displayName": "2D Camera System",
   "description": "An expansion of a 2D Camera System that adds toggleable effects\nto the camera.",
   "unity": "2021.3",

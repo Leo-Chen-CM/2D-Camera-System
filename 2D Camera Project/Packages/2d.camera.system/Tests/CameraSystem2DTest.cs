@@ -4,51 +4,63 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 public class CameraSystem2DTest
 {
     Scene testScene;
-    Camera m_mainCamera;
     GameObject m_game;
     [SetUp]
     public void Setup()
     {
+        //SceneManager.UnloadSceneAsync(testScene);
         testScene = SceneManager.CreateScene("Testing Scene");
         SceneManager.SetActiveScene(testScene);
-        m_mainCamera = new Camera();
-        m_mainCamera.tag = "MainCamera";
-        m_game = new GameObject("Camera",typeof(CameraSystem2D));
-        //m_gameObject.AddComponent<Camera>();
+        m_game = new GameObject("Camera");
+        m_game.AddComponent<Camera>();
+        m_game.GetComponent<Camera>().tag = "MainCamera";
+        m_game.AddComponent<CameraSystem2D>();
 
     }
 
     [TearDown]
     public void Teardown()
     {
-        Object.Destroy(m_mainCamera);
+        Object.Destroy(m_game);
+        SceneManager.UnloadSceneAsync(testScene);
     }
 
     [UnityTest]
     public IEnumerator CameraSystem2DFadeScreen()
     {
-        yield return new WaitForSeconds(10);
+        m_game.GetComponent<CameraSystem2D>().FadeInOut();
+        yield return new WaitForSeconds(5);
+        Assert.LessOrEqual(m_game.GetComponent<CameraSystem2D>().ReturnBlackOutImage().GetComponent<Image>().color.a, 5);
+    }
+
+    [UnityTest]
+    public IEnumerator CameraSystem2DSpeedZoomIncrease()
+    {
+        m_game.GetComponent<CameraSystem2D>().FadeInOut();
+        yield return new WaitForSeconds(5);
+        Assert.LessOrEqual(m_game.GetComponent<CameraSystem2D>().ReturnBlackOutImage().GetComponent<Image>().color.a, 5);
     }
 
     // A Test behaves as an ordinary method
-    [Test]
-    public void CameraSystem2DTestSimplePasses()
-    {
-        GameObject gameObject = GameObject.Find("FadeOutScreen");
-        Assert.IsNotNull(gameObject);
-    }
+    //[Test]
+    //public void CameraSystem2DTestSimplePasses()
+    //{
+    //    GameObject gameObject = GameObject.Find("FadeOutScreen");
+    //    Assert.IsNotNull(gameObject);
+    //}
 
     // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
     // `yield return null;` to skip a frame.
-    [UnityTest]
-    public IEnumerator CameraSystem2DTestWithEnumeratorPasses()
-    {
-        // Use the Assert class to test conditions.
-        // Use yield to skip a frame.
-        yield return null;
-    }
+    //[UnityTest]
+    //public IEnumerator CameraSystem2DTestWithEnumeratorPasses()
+    //{
+    //    // Use the Assert class to test conditions.
+    //    // Use yield to skip a frame.
+    //    yield return null;
+    //}
 }
