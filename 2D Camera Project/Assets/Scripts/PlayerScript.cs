@@ -11,6 +11,7 @@ public class PlayerScript : MonoBehaviour
     float horizontalMove = 0f;
     private Rigidbody2D rig;
     private bool isGrounded;
+
     // Start is called before the first frame update
     void Start()
     {

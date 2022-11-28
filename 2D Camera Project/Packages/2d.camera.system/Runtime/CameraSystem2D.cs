@@ -130,6 +130,8 @@ public class CameraSystem2D : MonoBehaviour
                 m_vignetteTransparancey -= 0.05f;
                 VignetteEffect();
             }
+
+            VignetteEffect();
         }
 
     }
