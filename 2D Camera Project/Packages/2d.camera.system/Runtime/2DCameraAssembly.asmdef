@@ -1,9 +1,7 @@
 {
     "name": "2DCameraAssembly",
     "rootNamespace": "",
-    "references": [
-        ""
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

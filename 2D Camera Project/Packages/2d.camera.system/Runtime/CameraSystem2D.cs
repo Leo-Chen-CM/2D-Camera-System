@@ -40,6 +40,8 @@ public class CameraSystem2D : MonoBehaviour
     public bool m_toggleCameraFollowPlayer;
     private bool m_fadeToBlack;
     public bool m_toggleVingetteEffect;
+
+    public bool m_toggleDebugMode;
     // Start is called before the first frame update
     void Start()
     {
