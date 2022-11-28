@@ -497,9 +497,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_fadeoutSpeed: 5
-  m_toggleSpeedZoomOut: 1
-  m_toggleFadeOut: 1
-  m_toggleCameraFollowPlayer: 1
+  m_cameraOffset: 10
+  m_vignetteTransparancey: 1
+  m_damageScreenSprite: {fileID: 21300000, guid: 596bdb1fbab153d4c9043587684343a6, type: 3}
+  m_toggleSpeedZoomOut: 0
+  m_toggleFadeOut: 0
+  m_toggleCameraFollowPlayer: 0
+  m_toggleVingetteEffect: 1
 --- !u!1 &1470628874
 GameObject:
   m_ObjectHideFlags: 0

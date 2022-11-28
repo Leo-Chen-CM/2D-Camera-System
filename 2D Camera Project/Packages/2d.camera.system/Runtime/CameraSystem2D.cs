@@ -16,16 +16,30 @@ public class CameraSystem2D : MonoBehaviour
     [SerializeField]
     [Range(1, 10)]
     private int m_fadeoutSpeed = 5;
+
     private GameObject m_gameObject;
     private Canvas m_canvas;
     private GameObject m_blackOutImage;
+
+    //Camera pan variables
+    [SerializeField]
+    [Range(10, 50)]
+    private int m_cameraOffset = 10;
+
+    //vignette Effects
+    [SerializeField]
+    [Range(0, 1)]
+    private float m_vignetteTransparancey = 0;
+
+    public Sprite m_damageScreenSprite;
+    private GameObject m_vignetteGameObject;
 
     //Toggles
     public bool m_toggleSpeedZoomOut;
     public bool m_toggleFadeOut;
     public bool m_toggleCameraFollowPlayer;
-
     private bool m_fadeToBlack;
+    public bool m_toggleVingetteEffect;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,6 +65,21 @@ public class CameraSystem2D : MonoBehaviour
         m_blackOutImage.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
         m_blackOutImage.GetComponent<Image>().color = new Color(0,0,0,0);
 
+        m_vignetteGameObject = new GameObject();
+        m_vignetteGameObject.transform.SetParent(m_canvas.transform);//Sets the canvas as the parent of the image
+        m_vignetteGameObject.transform.localScale = Vector3.one;
+        m_vignetteGameObject.AddComponent<Image>();
+        m_vignetteGameObject.name = "VignetteScreen";
+        m_vignetteGameObject.GetComponent<Image>().sprite = m_damageScreenSprite;
+        m_vignetteGameObject.GetComponent<Image>().rectTransform.anchoredPosition = new Vector2(0f, 0f);
+        m_vignetteGameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
+        m_vignetteGameObject.GetComponent<Image>().color = new Color
+            (
+            m_vignetteGameObject.GetComponent<Image>().color.r,
+            m_vignetteGameObject.GetComponent<Image>().color.g,
+            m_vignetteGameObject.GetComponent<Image>().color.b,
+            0);
+
         m_mainPlayer = GameObject.FindGameObjectWithTag("Player");
 
         m_originalCameraSize = Camera.main.orthographicSize;
@@ -73,7 +102,7 @@ public class CameraSystem2D : MonoBehaviour
             }
             else
             {
-                transform.position = new Vector3( m_mainPlayer.transform.position.x , m_mainPlayer.transform.position.y, -10);
+                transform.position = new Vector3(m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
                 if (m_toggleSpeedZoomOut)
                 {
                     SpeedZoom();
@@ -87,6 +116,57 @@ public class CameraSystem2D : MonoBehaviour
             {
                 FadeInOut();
             }
+        }
+
+        if (m_toggleVingetteEffect)
+        {
+            if (Input.GetKeyUp(KeyCode.UpArrow) && m_vignetteTransparancey < 1)
+            {
+                m_vignetteTransparancey += 0.05f;
+                VignetteEffect();
+            }
+            if (Input.GetKeyUp(KeyCode.DownArrow) && m_vignetteTransparancey > 0)
+            {
+                m_vignetteTransparancey -= 0.05f;
+                VignetteEffect();
+            }
+        }
+
+    }
+
+    private void VignetteEffect()
+    {
+        m_vignetteGameObject.GetComponent<Image>().color = new Color
+            (
+            m_vignetteGameObject.GetComponent<Image>().color.r,
+            m_vignetteGameObject.GetComponent<Image>().color.g,
+            m_vignetteGameObject.GetComponent<Image>().color.b,
+            m_vignetteTransparancey);
+    }
+    public void AssignVignetteValue(float t_value)
+    {
+        m_vignetteTransparancey = t_value/100;
+    }
+    private void CameraLookKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.W) && Input.GetKeyDown(KeyCode.Space))
+        {
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+        {
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
+        {
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.D) && Input.GetKeyDown(KeyCode.Space))
+        {
+
         }
     }
 
