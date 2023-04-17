@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,9 @@ using UnityEngine.UI;
 
 public class CameraSystem2D : MonoBehaviour
 {
+
+    public static CameraSystem2D Instance;
+
     //Speed zoom out related
     private float m_currentSpeed;
     private float m_maxSize;
@@ -23,13 +27,18 @@ public class CameraSystem2D : MonoBehaviour
 
     //Camera pan variables
     [SerializeField]
-    [Range(10, 50)]
-    private int m_cameraOffset = 10;
+    [Range(1, 50)]
+    private int m_cameraOffset = 5;
+    private Vector3 m_originalCameraPosition;
+    private Vector3 m_mainPlayerPosition;
+    Vector3 velocity = Vector3.zero;
+    public int m_cameraMoveSpeed;
 
     //vignette Effects
     [SerializeField]
     [Range(0, 1)]
     private float m_vignetteTransparancey = 0;
+    private float m_transparancey = 0;
 
     public Sprite m_damageScreenSprite;
     private GameObject m_vignetteGameObject;
@@ -38,13 +47,46 @@ public class CameraSystem2D : MonoBehaviour
     public bool m_toggleSpeedZoomOut;
     public bool m_toggleFadeOut;
     public bool m_toggleCameraFollowPlayer;
-    private bool m_fadeToBlack;
+    public bool m_toggleCameraPan;
     public bool m_toggleVingetteEffect;
+    private bool m_fadeToBlack;
 
+    //Axis locking toggles
+    public bool m_lockXAxis;
+    private bool m_xAxisLocked;
+    public bool m_lockYAxis;
+    private bool m_yAxisLocked;
+    float m_xAxis;
+    float m_yAxis;
+
+
+    public bool m_toggleCameraZoom;
     public bool m_toggleDebugMode;
-    // Start is called before the first frame update
+
+    Vector3 m_target ;
+
+    public bool m_looking;
+
+
+    [SerializeField]
+    bool m_usingEffect;
+    [SerializeField]
+    float m_fieldOfView;
+    [SerializeField]
+    float m_sensitivity = 10f;
+    [SerializeField]
+    int m_minZoom = 10;
+
+    [SerializeField]
+    int m_maxZoom = 30;
+
     void Start()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+
         m_maxSize = 20;
 
         //Canvas
@@ -84,7 +126,12 @@ public class CameraSystem2D : MonoBehaviour
 
         m_mainPlayer = GameObject.FindGameObjectWithTag("Player");
 
+        m_originalCameraPosition = Camera.main.transform.position;
         m_originalCameraSize = Camera.main.orthographicSize;
+
+
+        m_mainPlayerPosition = new Vector3(m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
+        m_target = new Vector3(m_originalCameraPosition.x, m_cameraOffset + m_originalCameraPosition.y, m_originalCameraPosition.z);
     }
 
     public GameObject ReturnBlackOutImage()
@@ -104,12 +151,19 @@ public class CameraSystem2D : MonoBehaviour
             }
             else
             {
-                transform.position = new Vector3(m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
+                //transform.position = new Vector3(m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
+                MoveCameraBackToPlayer();
                 if (m_toggleSpeedZoomOut)
                 {
                     SpeedZoom();
                 }              
             }
+        }
+
+
+        if (m_toggleCameraPan)
+        {
+            CameraLookKeys();
         }
 
         if (m_toggleFadeOut)
@@ -122,24 +176,63 @@ public class CameraSystem2D : MonoBehaviour
 
         if (m_toggleVingetteEffect)
         {
-            if (Input.GetKeyUp(KeyCode.UpArrow) && m_vignetteTransparancey < 1)
-            {
-                m_vignetteTransparancey += 0.05f;
-                VignetteEffect();
-            }
-            if (Input.GetKeyUp(KeyCode.DownArrow) && m_vignetteTransparancey > 0)
-            {
-                m_vignetteTransparancey -= 0.05f;
-                VignetteEffect();
-            }
-
             VignetteEffect();
         }
 
+        if (m_toggleCameraZoom)
+        {
+            CameraZoom();
+        }
+
+        m_mainPlayerPosition = new Vector3(m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
+        m_originalCameraPosition = Camera.main.transform.position;
+
+        if (m_lockXAxis)
+        {
+            LockXAxis();
+            Camera.main.transform.position = new Vector3(m_xAxis, Camera.main.transform.position.y, Camera.main.transform.position.z);
+        }
+        else
+        {
+            m_xAxisLocked = false;
+        }
+
+        if (m_lockYAxis)
+        {
+            LockYAxis();
+            Camera.main.transform.position = new Vector3(Camera.main.transform.position.x, m_yAxis, Camera.main.transform.position.z);
+        }
+        else
+        {
+            m_yAxisLocked = false;
+        }
+    }
+
+    void LockXAxis()
+    {
+        if (!m_xAxisLocked)
+        {
+            m_xAxis = m_originalCameraPosition.x;
+            m_xAxisLocked = true;
+        }
+
+    }
+    
+    void LockYAxis()
+    {
+        if (!m_yAxisLocked)
+        {
+            m_yAxis = m_originalCameraPosition.y;
+            m_yAxisLocked = true;
+        }
     }
 
     private void VignetteEffect()
     {
+        //float transparancey = t_number / 255;
+
+        //m_vignetteTransparancey = transparancey;
+
         m_vignetteGameObject.GetComponent<Image>().color = new Color
             (
             m_vignetteGameObject.GetComponent<Image>().color.r,
@@ -149,28 +242,77 @@ public class CameraSystem2D : MonoBehaviour
     }
     public void AssignVignetteValue(float t_value)
     {
-        m_vignetteTransparancey = t_value/100;
+        //float transparancey = t_value;
+        //m_vignetteTransparancey = transparancey / 100;
+
+        m_transparancey += t_value;
+
+        m_vignetteTransparancey = m_transparancey / 100;
+
     }
+
+    /// <summary>
+    /// Pressing pre-defined keys will have the camera pan to X position away from the player
+    /// </summary>
     private void CameraLookKeys()
     {
-        if (Input.GetKeyDown(KeyCode.W) && Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.UpArrow) && Input.GetKey(KeyCode.LeftControl))
         {
-
+            m_toggleCameraFollowPlayer = false;
+            m_usingEffect = true;
+            m_target = new Vector3(m_mainPlayer.transform.position.x, m_cameraOffset + m_mainPlayer.transform.position.y, -10);
+            transform.position = Vector3.SmoothDamp(Camera.main.transform.position, m_target, ref velocity, m_cameraMoveSpeed * Time.deltaTime);
         }
-
-        if (Input.GetKeyDown(KeyCode.S) && Input.GetKeyDown(KeyCode.Space))
+        else if (Input.GetKey(KeyCode.DownArrow) && Input.GetKey(KeyCode.LeftControl))
         {
-
+            m_toggleCameraFollowPlayer = false;
+            m_usingEffect = true;
+            m_target = new Vector3(m_mainPlayer.transform.position.x, -m_cameraOffset + m_mainPlayer.transform.position.y, -10);
+            transform.position = Vector3.SmoothDamp(Camera.main.transform.position, m_target, ref velocity, m_cameraMoveSpeed * Time.deltaTime);
         }
-
-        if (Input.GetKeyDown(KeyCode.A) && Input.GetKeyDown(KeyCode.Space))
+        else if (Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.LeftControl))
         {
-
+            m_toggleCameraFollowPlayer = false;
+            m_usingEffect = true;
+            m_target = new Vector3(-m_cameraOffset + m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
+            transform.position = Vector3.SmoothDamp(Camera.main.transform.position, m_target, ref velocity, m_cameraMoveSpeed * Time.deltaTime);
         }
-
-        if (Input.GetKeyDown(KeyCode.D) && Input.GetKeyDown(KeyCode.Space))
+        else if (Input.GetKey(KeyCode.RightArrow) && Input.GetKey(KeyCode.LeftControl))
         {
+            m_toggleCameraFollowPlayer = false;
+            m_usingEffect = true;
+            m_target = new Vector3(m_cameraOffset + m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
+            transform.position = Vector3.SmoothDamp(Camera.main.transform.position, m_target, ref velocity, m_cameraMoveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            m_toggleCameraFollowPlayer = true;
+            MoveCameraBackToPlayer();
+        }
+    }
+    private void CameraZoom()
+    {
+        m_fieldOfView -= Input.GetAxis("Mouse ScrollWheel") * m_sensitivity;
+        m_fieldOfView = Mathf.Clamp(m_fieldOfView, m_minZoom, m_maxZoom);
+        Camera.main.orthographicSize = m_fieldOfView;
+    }
 
+    void MoveCameraBackToPlayer()
+    {
+        if (m_usingEffect)
+        {
+            if (Vector2.Distance(transform.position, m_mainPlayerPosition) > 0.5f)
+            {
+                transform.position = Vector3.SmoothDamp(Camera.main.transform.position, m_mainPlayerPosition, ref velocity, (m_cameraMoveSpeed / 2) * Time.deltaTime);
+            }
+            else
+            {
+                m_usingEffect = false;
+            }
+        }
+        else
+        {
+            transform.position = new Vector3(m_mainPlayer.transform.position.x, m_mainPlayer.transform.position.y, -10);
         }
     }
 

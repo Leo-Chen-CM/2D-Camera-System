@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviour
     private float jumpHeight = 2.0f;
     private Vector2 playerVelocity;
     float horizontalMove = 0f;
-    private Rigidbody2D rig;
+    public Rigidbody2D rig;
     private bool isGrounded;
 
     // Start is called before the first frame update
@@ -39,6 +39,7 @@ public class PlayerScript : MonoBehaviour
         //transform.position += playerVelocity * Time.deltaTime;
 
         rig.velocity += playerVelocity * Time.deltaTime;
+        //rig.velocity = new Vector2 (horizontalMove * speed, rig.velocity.y);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
