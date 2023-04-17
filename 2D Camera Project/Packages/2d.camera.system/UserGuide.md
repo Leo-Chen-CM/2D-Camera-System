@@ -21,5 +21,12 @@ Once the component is attached to the main camera and the player tag is designat
 The player's speed changes how large the zoom will be. If the player slows down or stops, the camera zoom will change back to its original size.
 
 ### Camera Fade to black
-You will need to create a Unity Canvas attached to the Camera. In it will need to have an Image of a color of your choice. Set its alpha to zero.
-Currently in order to fade in and out of the screen it is tied to the E key. Pressing it will fade the camera to black or transparent.
+Currently in order to fade in and out of the screen you'll need to attach the "Activator Fade" script to an object. Said object requries a trigger collider.
+
+### Axis Locking
+The X or Y axis can be locked through a toggle. In the camera component you'll be able to lock the X or Y axis. This will prevent the camera from moving along the respective axis.
+
+### Vignette Damage Effect
+The Vignette damage effect requires an image to be used in the Camera System 2D script object. You'll need to attach the "Activator Damage" script to an object. Said object requires a trigger collider.
+
+### 
