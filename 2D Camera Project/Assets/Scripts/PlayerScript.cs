@@ -1,16 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class PlayerScript : MonoBehaviour
 {
     //Movement
     private float speed = 10;
-    private float jumpHeight = 2.0f;
+    public float jumpHeight = 2.0f;
     private Vector2 playerVelocity;
     float horizontalMove = 0f;
     public Rigidbody2D rig;
-    private bool isGrounded;
+    public bool isGrounded;
 
     // Start is called before the first frame update
     void Start()
@@ -28,18 +27,21 @@ public class PlayerScript : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W) && isGrounded)
         {
-            //rig.velocity = new Vector2(rig.velocity.x, jumpHeight);
-
             Vector3 jump = new Vector3(0.0f, 200.0f, 0.0f);
 
             rig.AddForce(jump * jumpHeight);
             isGrounded = false;
             Debug.Log("You pressed jump");
         }
-        //transform.position += playerVelocity * Time.deltaTime;
 
         rig.velocity += playerVelocity * Time.deltaTime;
-        //rig.velocity = new Vector2 (horizontalMove * speed, rig.velocity.y);
+
+
+        if (Input.GetKeyUp(KeyCode.Backspace))
+        {
+            Debug.Log("Player has totally died");
+            CameraSystem2D.Instance.FadeInOut();
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

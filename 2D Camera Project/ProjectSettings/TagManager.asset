@@ -7,6 +7,7 @@ TagManager:
   - Floor
   - FadeScreen
   - Event Trigger
+  - Ladder
   layers:
   - Default
   - TransparentFX
